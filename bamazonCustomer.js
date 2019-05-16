@@ -101,7 +101,7 @@ function backpackSearch() {
                 res[i].id + " | " +
                 res[i].item_id + " | " +
                 res[i].product_name + " | " +
-                res[i].department_name + " | " +
+                res[i].department_name + " | $" +
                 res[i].price);
         }
         console.log(query.sql);
@@ -121,7 +121,7 @@ function sleepingBagSearch() {
                 res[i].id + " | " +
                 res[i].item_id + " | " +
                 res[i].product_name + " | " +
-                res[i].department_name + " | " +
+                res[i].department_name + " | $" +
                 res[i].price);
         }
         console.log(query.sql);
@@ -141,7 +141,7 @@ function tentsSearch() {
                 res[i].id + " | " +
                 res[i].item_id + " | " +
                 res[i].product_name + " | " +
-                res[i].department_name + " | " +
+                res[i].department_name + " | $" +
                 res[i].price);
         }
         console.log(query.sql);
@@ -161,7 +161,7 @@ function chairsSearch() {
                 res[i].id + " | " +
                 res[i].item_id + " | " +
                 res[i].product_name + " | " +
-                res[i].department_name + " | " +
+                res[i].department_name + " | $" +
                 res[i].price);
         }
         console.log(query.sql);
@@ -176,7 +176,7 @@ function buyItem() {
         .prompt([{
                 name: "IDNumber",
                 type: "input",
-                message: "Please enter the ID Number for the product you'd like to purhcase.",
+                message: "Please enter the ID Number for the product you'd like to purchase.",
                 validate: function (value) {
                     if (isNaN(value) === false) {
                         return true;
@@ -196,33 +196,34 @@ function buyItem() {
                 }
             }
         ])
-        .then(function (response) {
-            var itemsquantity = response.quantity;
-            var itemsID = response.IDNumber;
-            purchase(itemsID, itemsquantity);
+        .then(function (answer) {
+            var qty = answer.quantity;
+            var ID = answer.IDNumber;
+            purchase(ID, qty);
         });
 }
 
-function purchase(IDNumber, itemsWanted) {
-    connection.query('SELECT * FROM products WHERE id = ' + IDNumber, function (err, res) {
+function purchase(ID, qty) {
+    connection.query("SELECT * FROM products WHERE id = " + ID, function (err, res) {
         if (err) throw err;
-        if (itemsWanted <= res[0].stock_quantity) {
-            var grandTotal = res[0].price * itemsWanted;
+        if (qty <= res[0].stock_quantity) {
+            var total = res[0].price * qty;
             console.log("\n-------------------------------------------------------------------------\n");
             console.log("Great! Let me get that ready for you.\n");
-            console.log("Here is your cart total. The cost for " + itemsWanted + " " + res[0].product_name + " is $ " + grandTotal);
+            console.log("Here is your cart total. The cost for " + qty + " " + res[0].product_name + " is $" + total);
             console.log("-------------------------------------------------------------------------\n");
-            connection.query("UPDATE products SET stock_quantity = stock_quantity - " + itemsWanted + "WHERE item_Requested = " + IDNumber);
-            another();
+            connection.query("UPDATE products SET stock_quantity = stock_quantity - " + qty + ID);
+            buyAnother();
         } else {
             console.log("-------------------------------------------------------------------------\n");
             console.log("Sorry we're a bit short on that particular item.\nWe aren't able to complete this order at this time.");
             console.log("-------------------------------------------------------------------------\n");
+            buyAnother();
         };
     });
 }
 
-function another() {
+function buyAnother() {
     console.log("Let's look into that");
     inquirer.prompt({
             name: "buyAnother",
@@ -231,10 +232,10 @@ function another() {
             choices: ["Yes", "No"],
         })
         .then(function (answer) {
-            if (answer.buyAnotherItem === "Yes") {
+            if (answer.buyAnother === "Yes") {
                 console.log("Cool, let's choose your item!");
                 console.log("-------------------------------------------------------------------------\n");
-                // offer();
+                offer();
             } else {
                 console.log("-----------------------------------------------------------\n");
                 console.log("Thank you for visiting, please come back again!")
