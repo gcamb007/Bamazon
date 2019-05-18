@@ -1,6 +1,7 @@
 
 # Bamazon
-Online store
+
+## Online store
 
 Welcome to the Bamazon Outdoor Gear Online Store
 
@@ -11,4 +12,8 @@ will walk through a series of steps to help you find and purchase the equipment 
 
 PLease review the video in the link for a preview of the application's flow.
 
-https://youtu.be/B12wb3OjELA
+Bamazon on YouTube: https://youtu.be/B12wb3OjELA
+
+
+## Author
+* **Gerardo Cambronero** 
