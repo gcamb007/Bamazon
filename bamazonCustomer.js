@@ -5,7 +5,7 @@ const connection = mysql.createConnection({
     host: "127.0.0.1",
     port: 8889,
     user: "root",
-    password: "",
+    password: "jessy",
     database: "bamazon_DB"
 });
 
@@ -104,7 +104,7 @@ function backpackSearch() {
                 res[i].department_name + " | $" +
                 res[i].price);
         }
-        console.log(query.sql);
+        // console.log(query.sql);
         console.log("-------------------------------------------------------------------------\n");
         buyItem();
     });
@@ -124,7 +124,7 @@ function sleepingBagSearch() {
                 res[i].department_name + " | $" +
                 res[i].price);
         }
-        console.log(query.sql);
+        // console.log(query.sql);
         console.log("-------------------------------------------------------------------------\n");
         buyItem();
     });
@@ -144,7 +144,7 @@ function tentsSearch() {
                 res[i].department_name + " | $" +
                 res[i].price);
         }
-        console.log(query.sql);
+        // console.log(query.sql);
         console.log("-------------------------------------------------------------------------\n");
         buyItem();
     });
@@ -164,7 +164,7 @@ function chairsSearch() {
                 res[i].department_name + " | $" +
                 res[i].price);
         }
-        console.log(query.sql);
+        // console.log(query.sql);
         console.log("-------------------------------------------------------------------------\n");
         buyItem();
     });
@@ -223,7 +223,7 @@ function purchase(ID, qty) {
     });
 }
 
-function buyAnother() {
+function buyAnother(offer) {
     console.log("Let's look into that");
     inquirer.prompt({
             name: "buyAnother",
@@ -238,7 +238,7 @@ function buyAnother() {
                 offer();
             } else {
                 console.log("-----------------------------------------------------------\n");
-                console.log("Thank you for visiting, please come back again!")
+                console.log("No problem! Thank you for visiting and please come back again!")
                 console.log("-----------------------------------------------------------\n");
                 connection.end();
             }
