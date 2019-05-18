@@ -1,5 +1,6 @@
 const mysql = require("mysql");
 const inquirer = require("inquirer");
+const cart = [];
 
 const connection = mysql.createConnection({
     host: "127.0.0.1",
@@ -13,7 +14,6 @@ connection.connect(function (err) {
     if (err) throw err;
     // console.log("connected as itemRequested " + connection.threaditemRequested);
     afterConnection();
-
 });
 
 function afterConnection() {
@@ -28,7 +28,6 @@ function afterConnection() {
         start(res);
     });
 };
-
 
 function start(res) {
     // console.log(res)
@@ -76,14 +75,14 @@ function search(department) {
     var query = connection.query("SELECT * FROM products WHERE department_name=?", department, function (err, res) {
         console.log("-------------------------------------------------------------------------");
         console.log("\n====== Okay! Here is our stock for that item. ======\n");
-        console.table(res)
+        console.table(res);
         console.log("-------------------------------------------------------------------------");
         for (var i = 0; i < res.length; i++) {
             console.log(
-                res[i].id +
-                res[i].item_id +
-                res[i].product_name +
-                res[i].department_name + "$" +
+                res[i].id + " | " +
+                res[i].item_id + " | " +
+                res[i].product_name + " | " +
+                res[i].department_name + " | $" +
                 res[i].price);
         }
         // console.log(query.sql);
@@ -91,6 +90,7 @@ function search(department) {
         buyItem();
     });
 }
+
 
 function buyItem() {
     // console.log(res)
@@ -121,31 +121,17 @@ function buyItem() {
         .then(function (answer) {
             var qty = answer.quantity;
             var ID = answer.IDNumber;
-            purchase(ID, qty);
+            var order = {
+                qty: qty,
+                ID: ID
+            }
+            cart.push(order);
+            buyAnother();
         });
 }
 
-function purchase(ID, qty) {
-    connection.query("SELECT * FROM products WHERE id = " + ID, function (err, res) {
-        if (err) throw err;
-        if (qty <= res[0].stock_quantity) {
-            var total = res[0].price * qty;
-            console.log("\n-------------------------------------------------------------------------\n");
-            console.log("Great! Let me get that ready for you.\n");
-            console.log("Here is your cart total. The cost for " + qty + " " + res[0].product_name + " is $" + total);
-            console.log("-------------------------------------------------------------------------\n");
-            connection.query("UPDATE products SET stock_quantity = stock_quantity - " + qty, "WHERE id =" + ID);
-            buyAnother();
-        } else {
-            console.log("-------------------------------------------------------------------------\n");
-            console.log("Sorry we're a bit short on that particular item.\nWe aren't able to complete this order at this time.");
-            console.log("-------------------------------------------------------------------------\n");
-            buyAnother(total);
-        };
-    });
-}
-
-function buyAnother(total) {
+function buyAnother() {
+    console.log("Let's look into that");
     inquirer.prompt({
             name: "buyAnother",
             type: "list",
@@ -159,11 +145,34 @@ function buyAnother(total) {
                 offer();
             } else {
                 console.log("-----------------------------------------------------------\n");
-                console.log("No problem!");
-                console.log("Your cart total is $" + total);
-                console.log("Thank you for visiting and please come back again!");
+                console.log("No problem! Thank you for visiting and please come back again!")
                 console.log("-----------------------------------------------------------\n");
-                connection.end();
+                purchase();
             }
         });
+}
+
+function purchase() {
+    console.log(cart);
+    for (var i = 0; i < cart.length; i++) {
+        connection.query("SELECT * FROM products WHERE id = " + cart[i].ID, function (err, res) {
+            console.log("cart", cart);
+            if (err) throw err;
+            console.log("cart", cart);
+            if (cart[i].qty <= res[0].stock_quantity) {
+                var total = res[0].price * cart[i].qty;
+                console.log("cart", cart);
+                console.log("\n-------------------------------------------------------------------------\n");
+                console.log("Great! Let me get that ready for you.\n");
+                console.log("Here is your cart total. The cost for " + cart[i].qty + " " + res[0].product_name + " is $" + total);
+                console.log("-------------------------------------------------------------------------\n");
+                connection.query("UPDATE products SET stock_quantity = stock_quantity - " + cart[i].qty);
+            } else {
+                console.log("-------------------------------------------------------------------------\n");
+                console.log("Sorry we're a bit short on that particular item.\nWe aren't able to complete this order at this time.");
+                console.log("-------------------------------------------------------------------------\n");
+
+            };
+        });
+    }
 }
